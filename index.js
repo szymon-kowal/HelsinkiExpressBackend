@@ -16,6 +16,8 @@ const data = [
 app.use(cors());
 app.use(express.json());
 
+app.use(express.static("dist"));
+
 // Morgan custom token
 morgan.token("postJSON", function (req, res) {
     if (req.method === "POST") {
