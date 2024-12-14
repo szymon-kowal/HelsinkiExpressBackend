@@ -1,0 +1,18 @@
+### DELETE Request for ID 1
+DELETE http://localhost:3001/api/persons/1 HTTP/1.1
+
+###
+
+### DELETE Request for ID 5
+DELETE http://localhost:3001/api/persons/5 HTTP/1.1
+
+###
+
+### POST Request for ID 5
+POST http://localhost:3001/api/persons HTTP/1.1
+content-type: application/json
+
+{
+    "name": "Mary",
+    "number": "39-23"
+}
