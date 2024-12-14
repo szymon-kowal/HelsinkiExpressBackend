@@ -15,7 +15,6 @@ const data = [
 // Middleware
 app.use(cors());
 app.use(express.json());
-
 app.use(express.static("dist"));
 
 // Morgan custom token
@@ -39,9 +38,6 @@ app.use(
 );
 
 // Routes
-app.get("/", (req, res) => {
-    res.send("Hello world");
-});
 
 app.get("/api/persons", (req, res) => {
     res.send(data);
