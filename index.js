@@ -18,6 +18,8 @@ const errorHandler = (error, request, response, next) => {
 
     if (error.name === "CastError") {
         return response.status(400).send({ error: "malformatted id" });
+    } else if (error.name === "ValidationError") {
+        return response.status(400).json({ error: error.message });
     }
 
     next(error);
@@ -49,18 +51,17 @@ app.use(
 
 // Routes
 
-app.get("/api/persons", (req, res) => {
+app.get("/api/persons", (req, res, next) => {
     Person.find({})
         .then((result) => {
-            result.forEach((person) => {
-                console.log(person);
-            });
             res.send(result);
         })
-        .catch((err) => next(err));
+        .catch((err) => {
+            next(err);
+        });
 });
 
-app.get("/api/persons/:id", (req, res) => {
+app.get("/api/persons/:id", (req, res, next) => {
     Person.findById(req.params.id)
         .then((note) => {
             if (note) {
@@ -69,19 +70,20 @@ app.get("/api/persons/:id", (req, res) => {
                 response.status(404).end();
             }
         })
-        .catch((error) => next(error));
+        .catch((error) => {
+            next(error);
+        });
 });
 
-app.delete("/api/persons/:id", (req, res) => {
+app.delete("/api/persons/:id", (req, res, next) => {
     Person.findByIdAndDelete(req.params.id)
         .then((result) => {
-            console.log(result);
             return res.status(200).json(result);
         })
         .catch((error) => next(error));
 });
 
-app.put("/api/persons/:id", (req, res) => {
+app.put("/api/persons/:id", (req, res, next) => {
     const { name, number } = req.body;
 
     if (!name || !number) {
@@ -91,7 +93,7 @@ app.put("/api/persons/:id", (req, res) => {
     Person.findByIdAndUpdate(
         req.params.id,
         { name, number },
-        { new: true, runValidators: true }
+        { new: true, runValidators: true, context: "query" }
     )
         .then((updatedPerson) => {
             if (!updatedPerson) {
@@ -102,29 +104,41 @@ app.put("/api/persons/:id", (req, res) => {
         .catch((error) => next(error));
 });
 
-app.post("/api/persons", (req, res) => {
+app.post("/api/persons", (req, res, next) => {
     const { name: reqName, number: reqNumber } = req.body;
+
     if (!reqName || !reqNumber) {
         return res.status(400).json({ error: "Name and number are required" });
     }
+
     // Check for duplicate name
     Person.findOne({ name: reqName })
         .then((existingPerson) => {
             if (existingPerson) {
                 return res
                     .status(400)
-                    .json({ error: "Person is being duplicated" });
+                    .json({ error: "Person with this name already exists" });
             }
+
             const newPerson = new Person({ name: reqName, number: reqNumber });
+
+            newPerson.validateSync();
+            // if (validationError) {
+            //     return res.status(400).json({
+            //         error: validationError.message || "Validation error",
+            //     });
+            //
 
             return newPerson.save();
         })
         .then((savedPerson) => {
             if (savedPerson) {
-                res.status(201).json(savedPerson);
+                return res.status(201).json(savedPerson);
             }
         })
-        .catch((error) => next(error));
+        .catch((error) => {
+            next(error);
+        });
 });
 
 app.get("/info", (req, res) => {

@@ -4,7 +4,7 @@ DELETE http://localhost:3001/api/persons/1 HTTP/1.1
 ###
 
 ### DELETE Request for ID 5
-DELETE http://localhost:3001/api/persons/5 HTTP/1.1
+DELETE http://localhost:3001/api/persons/67631ec16539d600e2c78bfd HTTP/1.1
 
 ###
 
@@ -17,8 +17,7 @@ POST http://localhost:3001/api/persons HTTP/1.1
 content-type: application/json
 
 {
-    "id": 2,
-    "name": "Mary",
+    "name": "MaryAssadsdas",
     "number": "39-23"
 }
 
@@ -29,3 +28,13 @@ GET http://localhost:3001/info HTTP/1.1
 ###
 
 GET http://localhost:3001/api/persons/67631ec16539d600e2c78bfd HTTP/1.1
+
+###
+
+PUT http://localhost:3001/api/persons/67631ec16539d600e2c78bfd HTTP/1.1
+content-type: application/json
+
+{
+    "name": "Mary",
+    "number": "39-443"
+}
